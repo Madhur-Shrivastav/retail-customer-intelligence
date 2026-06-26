@@ -1,21 +1,28 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
-def prepare_features(df):
+import matplotlib.pyplot as plt
 
-    df = df.copy()
+def prepare_ml_data(customer_df):
 
-    # Remove columns not used for clustering
-    df = df.drop(columns=[
-        "CustomerID",
-        "BasketValue",
-        "TotalOrders",
-        "CancelledOrders",
-        "DaysSinceLastPurchase"
-    ])
+    features = customer_df[
+        [
+            "Recency",
+            "Frequency",
+            "Monetary",
+            "AverageOrderValue",
+            "CustomerTenure",
+            "ProductDiversity",
+            "TotalQuantity",
+            "ReturnRate"
+        ]
+    ].copy()
 
-    # Log-transform skewed features
+    # Log transform skewed features
     skewed = [
         "Monetary",
         "Frequency",
@@ -24,29 +31,21 @@ def prepare_features(df):
     ]
 
     for col in skewed:
-        df[col] = np.log1p(df[col])
-
-    return df
-
-from sklearn.preprocessing import StandardScaler
-
-
-def scale_features(df):
+        features[col] = np.log1p(features[col])
 
     scaler = StandardScaler()
 
-    scaled = scaler.fit_transform(df)
+    scaled = scaler.fit_transform(features)
 
-    return scaled, scaler
+    feature_names = features.columns.tolist()
 
-from sklearn.cluster import KMeans
-
+    return scaled, scaler, feature_names
 
 def elbow_method(data):
 
     inertia = []
 
-    for k in range(2, 11):
+    for k in range(2,11):
 
         model = KMeans(
             n_clusters=k,
@@ -56,18 +55,27 @@ def elbow_method(data):
 
         model.fit(data)
 
-        inertia.append(model.inertia)
+        inertia.append(model.inertia_)
+
+    plt.figure(figsize=(6,4))
+
+    plt.plot(range(2,11), inertia, marker="o")
+
+    plt.xlabel("Number of Clusters")
+    plt.ylabel("Inertia")
+    plt.title("Elbow Method")
+
+    plt.savefig("outputs/ml/elbow_curve.png")
+
+    plt.close()
 
     return inertia
 
-from sklearn.metrics import silhouette_score
-
-
-def silhouette_scores(data):
+def silhouette_analysis(data):
 
     scores = []
 
-    for k in range(2, 11):
+    for k in range(2,11):
 
         model = KMeans(
             n_clusters=k,
@@ -80,6 +88,18 @@ def silhouette_scores(data):
         score = silhouette_score(data, labels)
 
         scores.append(score)
+
+    plt.figure(figsize=(6,4))
+
+    plt.plot(range(2,11), scores, marker="o")
+
+    plt.xlabel("Number of Clusters")
+    plt.ylabel("Silhouette Score")
+    plt.title("Silhouette Analysis")
+
+    plt.savefig("outputs/ml/silhouette.png")
+
+    plt.close()
 
     return scores
 
@@ -95,10 +115,24 @@ def train_kmeans(data, k):
 
     return model, labels
 
-def assign_segments(customer_df, labels):
+def assign_clusters(customer_df, labels):
 
     result = customer_df.copy()
 
     result["Cluster"] = labels
+
+    return result
+
+def run_segmentation(customer_df, k=4):
+
+    scaled, scaler, feature_names = prepare_ml_data(customer_df)
+
+    elbow_method(scaled)
+
+    silhouette_analysis(scaled)
+
+    model, labels = train_kmeans(scaled, k)
+
+    result = assign_clusters(customer_df, labels)
 
     return result
