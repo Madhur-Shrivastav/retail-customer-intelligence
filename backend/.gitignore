@@ -60,3 +60,9 @@ outputs/*
 # IDE
 # ==========================
 .idea/
+
+credentials/
+
+.env
+
+config.py
