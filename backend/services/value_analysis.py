@@ -63,3 +63,35 @@ def generate_value_features(df):
     )
 
     return customer
+
+
+def generate_clv_segments(customer_df):
+
+    df = customer_df.copy()
+
+    # Simple CLV Score
+    df["CLVScore"] = (
+        df["Monetary"]
+        * df["Frequency"]
+        * (df["CustomerTenure"] + 1)
+    ) / 365
+
+    df["CLVSegment"] = pd.qcut(
+        df["CLVScore"],
+        5,
+        labels=[
+            "Very Low",
+            "Low",
+            "Medium",
+            "High",
+            "Premium"
+        ]
+    )
+
+    return df[
+        [
+            "CustomerID",
+            "CLVScore",
+            "CLVSegment"
+        ]
+    ]

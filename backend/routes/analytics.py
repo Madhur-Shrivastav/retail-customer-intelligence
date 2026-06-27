@@ -7,7 +7,7 @@ from services.eda import run_eda
 router = APIRouter()
 
 
-@router.post("/run-analysis")
+@router.post("/analyse")
 def run_analysis():
 
     input_file = "uploads/online_retail_II.xlsx"

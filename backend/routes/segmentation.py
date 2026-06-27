@@ -4,11 +4,13 @@ import os
 
 from services.clustering import run_segmentation
 from services.profiling import profile_clusters
+from services.rfm import generate_rfm_segments
+from services.value_analysis import generate_clv_segments
 
 router = APIRouter()
 
 
-@router.post("/run-segmentation")
+@router.post("/segment")
 def run_segmentation_api():
 
     input_file = "outputs/customer_analytics.csv"
@@ -30,6 +32,20 @@ def run_segmentation_api():
 
     profiles.to_csv(
         "outputs/cluster_profiles.csv",
+        index=False
+    )
+
+    rfm = generate_rfm_segments(customer_df)
+
+    rfm.to_csv(
+        "outputs/rfm_segments.csv",
+        index=False
+    )
+
+    clv = generate_clv_segments(customer_df)
+
+    clv.to_csv(
+        "outputs/clv_segments.csv",
         index=False
     )
 
