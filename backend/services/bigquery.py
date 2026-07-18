@@ -59,8 +59,14 @@ def ingest_outputs_to_bigquery():
         "rfm_segments":
             "outputs/rfm_segments.csv",
 
+        "rfm_cluster_profiles":
+            "outputs/rfm_cluster_profiles.csv",
+
         "clv_segments":
             "outputs/clv_segments.csv",
+
+        "clv_cluster_profiles":
+            "outputs/clv_cluster_profiles.csv",
 
         "customer_segments":
             "outputs/customer_segments.csv",

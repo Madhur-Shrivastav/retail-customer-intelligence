@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 from services.clustering import run_segmentation
-from services.profiling import profile_clusters
+from services.profiling import profile_clusters, profile_rfm_clusters, profile_clv_clusters
 from services.rfm import generate_rfm_segments
 from services.value_analysis import generate_clv_segments
 
@@ -42,10 +42,24 @@ def run_segmentation_api():
         index=False
     )
 
+    rfm_profile = profile_rfm_clusters(rfm)
+
+    rfm_profile.to_csv(
+        "outputs/rfm_cluster_profiles.csv",
+        index=False
+    )
+
     clv = generate_clv_segments(customer_df)
 
     clv.to_csv(
         "outputs/clv_segments.csv",
+        index=False
+    )
+
+    clv_profile = profile_clv_clusters(clv)
+
+    clv_profile.to_csv(
+        "outputs/clv_cluster_profiles.csv",
         index=False
     )
 

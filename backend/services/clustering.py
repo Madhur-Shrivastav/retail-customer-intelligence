@@ -16,9 +16,6 @@ def prepare_ml_data(customer_df):
             "Monetary",
             "AverageOrderValue",
             "CustomerTenure",
-            "ProductDiversity",
-            "TotalQuantity",
-            "ReturnRate"
         ]
     ].copy()
 
@@ -27,7 +24,6 @@ def prepare_ml_data(customer_df):
         "Monetary",
         "Frequency",
         "AverageOrderValue",
-        "TotalQuantity"
     ]
 
     for col in skewed:
@@ -37,9 +33,7 @@ def prepare_ml_data(customer_df):
 
     scaled = scaler.fit_transform(features)
 
-    feature_names = features.columns.tolist()
-
-    return scaled, scaler, feature_names
+    return scaled
 
 def elbow_method(data):
 
@@ -113,7 +107,7 @@ def train_kmeans(data, k):
 
     labels = model.fit_predict(data)
 
-    return model, labels
+    return labels
 
 def assign_clusters(customer_df, labels):
 
@@ -125,13 +119,13 @@ def assign_clusters(customer_df, labels):
 
 def run_segmentation(customer_df, k=4):
 
-    scaled, scaler, feature_names = prepare_ml_data(customer_df)
+    scaled = prepare_ml_data(customer_df)
 
     elbow_method(scaled)
 
     silhouette_analysis(scaled)
 
-    model, labels = train_kmeans(scaled, k)
+    labels = train_kmeans(scaled, k)
 
     result = assign_clusters(customer_df, labels)
 

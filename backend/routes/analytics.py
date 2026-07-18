@@ -1,8 +1,6 @@
 from fastapi import APIRouter
-
 from services.cleaning import clean_data
 from services.feature_engineering import generate_customer_features
-from services.eda import run_eda
 
 router = APIRouter()
 
@@ -16,8 +14,6 @@ def run_analysis():
 
     customer_df = generate_customer_features(df)
     
-    run_eda(customer_df)
-
     output_file = "outputs/customer_analytics.csv"
 
     customer_df.to_csv(output_file, index=False)
